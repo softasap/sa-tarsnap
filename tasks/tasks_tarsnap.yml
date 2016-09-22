@@ -16,7 +16,10 @@
       - tarsnap
 
   - name: TARSNAP | Unpack distribution
-    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
+    shell: "tar xfz tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz"
+    args:
+      chdir: /tmp
+#    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
     tags:
       - tarsnap
 
