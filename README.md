@@ -12,19 +12,20 @@ Example of usage (all parameters are optional)
 
 Simple
 
+```
   roles:
     - {
         role: "sa-tarsnap"
       }
-
+```
 
 Advanced:
 
-
+```
   roles:
     - {
         role: "sa-tarsnap",
         tarsnap_version: "1.0.37"
       }
-
+```
 
