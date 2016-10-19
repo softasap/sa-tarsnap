@@ -3,6 +3,7 @@ galaxy_info:
   author: vyacheslav voronenko
   description: Tarsnap is a secure online backup service for UNIX-like operating systems, including BSD, Linux and OS X
   company: http://www.voronenko.info/
+  license: "license (BSD, MIT)"
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
   # issue_tracker_url: http://example.com/issue/tracker
@@ -24,7 +25,7 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - trusty
-        - xenial 
+        - xenial
   galaxy_tags:
     - tarsnap
     - backup

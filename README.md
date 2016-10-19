@@ -29,3 +29,12 @@ Advanced:
       }
 ```
 
+
+
+
+Copyright and license
+---------------------
+
+Copyright 2016 - Vyacheslav Voronenko
+
+Code licensed under the [BSD 3 clause] (https://opensource.org/licenses/BSD-3-Clause) or the [MIT License] (http://opensource.org/licenses/MIT).
