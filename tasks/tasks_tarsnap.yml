@@ -1,22 +1,34 @@
 ---
+
+  - name: TARSNAP | Check if is present
+    command: test -x /usr/local/bin/tarsnap
+    ignore_errors: yes
+    register: tarsnap_present
+    tags:
+      - vault
+
+
   - name: TARSNAP | Dependencies
     apt: pkg="{{item}}" state="present"
     with_items:
-      - build-essential 
-      - ext2fs-dev 
-      - zlib1g-dev 
+      - build-essential
+      - ext2fs-dev
+      - zlib1g-dev
       - libssl-dev
     become: yes
+    when: tarsnap_present | failed
     tags:
       - tarsnap
 
   - name: TARSNAP | Download source code
     get_url: url="https://www.tarsnap.com/download/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz"
+    when: tarsnap_present | failed
     tags:
       - tarsnap
 
   - name: TARSNAP | Unpack distribution
     shell: "tar xfz tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz"
+    when: tarsnap_present | failed
     args:
       chdir: /tmp
 #    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
@@ -25,15 +37,17 @@
 
   - name: TARSNAP | build / configure
     shell: ./configure
+    when: tarsnap_present | failed
     args:
       chdir: "/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}"
     tags:
       - tarsnap
 
   - name: TARSNAP | make install
-    shell: make install clean                                                                           
+    shell: make install clean
     args:
       chdir: "/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}"
+    when: tarsnap_present | failed
     become: yes
     tags:
       - tarsnap
@@ -42,7 +56,7 @@
     command: test -x /usr/local/etc/tarsnap.conf
     ignore_errors: yes
     register: tarsnap_conf_present
-    tags: 
+    tags:
         - tarsnap
 
 
@@ -52,5 +66,3 @@
     become: yes
     tags:
         - tarsnap
-
-
