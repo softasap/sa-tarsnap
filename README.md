@@ -30,6 +30,61 @@ Advanced:
 ```
 
 
+Basic tarsnap usage
+===================
+
+Generate key, if you don't have any
+
+```bash
+tarsnap-keygen --keyfile ~/tarsnap.key --user v@gmail.com --machine mypc
+```
+
+
+backup routine  tarsnap_backup.sh
+
+```bash
+#!/bin/bash
+
+/usr/local/bin/tarsnap -P -c --cachedir ~/cache/ --keyfile ~/tarsnap.key -f "$(uname -n)-$(date +%Y-%m-%d_%H-%M-%S)" data
+
+```
+
+restore routine  tarsnap_restore.sh
+
+```bash
+#!/bin/bash
+ARCHIEVE=${1}
+TARGET_DIR=${2-.}
+mkdir -p $TARGET_DIR
+tarsnap --cachedir ~/cache/ --keyfile ~/tarsnap.key -p -x -f $ARCHIEVE -C $TARGET_DIR
+
+```
+
+List archieves  tarsnap_list.sh
+
+```bash
+#!/bin/bash
+/usr/local/bin/tarsnap --cachedir ~/cache/ --keyfile ~/tarsnap.key --list-archives | sort
+```
+
+
+Delete archieve by name  tarsnap_delete.sh
+
+```bash
+#!/bin/bash
+ARCHIEVE=${1-do-galaxy-2016-11-14_16-59-26}
+tarsnap --cachedir ~/cache/ --keyfile ~/tarsnap.key -d -f $ARCHIEVE
+```
+
+Delete all archieves associated with key  tarsnap_nuke.sh
+
+```bash
+#!/bin/bash
+tarsnap --cachedir ~/cache/ --keyfile ~/tarsnap.key --nuke
+```
+
+
+
 
 
 Copyright and license

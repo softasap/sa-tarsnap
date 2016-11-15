@@ -5,7 +5,7 @@
     ignore_errors: yes
     register: tarsnap_present
     tags:
-      - vault
+      - tarsnap
 
 
   - name: TARSNAP | Dependencies
