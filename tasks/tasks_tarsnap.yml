@@ -8,55 +8,96 @@
     tags:
       - tarsnap
 
+  - block:
 
-  - name: TARSNAP | Dependencies
-    apt: pkg="{{ item }}" state="present"
-    with_items:
-      - build-essential
-      - ext2fs-dev
-      - zlib1g-dev
-      - libssl-dev
-    become: yes
-    when: tarsnap_present is failed
-    tags:
-      - tarsnap
+    - name: TARSNAP | Dependencies
+      apt: pkg="{{ item }}" state="present"
+      with_items:
+        - build-essential
+        - ext2fs-dev
+        - zlib1g-dev
+        - libssl-dev
+      become: yes
+      when: tarsnap_present is failed
+      tags:
+        - tarsnap
 
-  - name: TARSNAP | Download source code
-    get_url:
-      url: "https://www.tarsnap.com/download/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
-      dest: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
-    when: tarsnap_present is failed
-    tags:
-      - tarsnap
+    - name: TARSNAP | Download source code
+      get_url:
+        url: "https://www.tarsnap.com/download/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+        dest: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+      when: tarsnap_present is failed
+      tags:
+        - tarsnap
 
-  - name: TARSNAP | Unpack distribution
-    shell: "tar xfz tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
-    when: tarsnap_present is failed
-    args:
-      chdir: /tmp
-#    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
-    tags:
-      - tarsnap
-      - skip_ansible_lint
+    - name: TARSNAP | Unpack distribution
+      shell: "tar xfz tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+      when: tarsnap_present is failed
+      args:
+        chdir: /tmp
+  #    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
+      tags:
+        - tarsnap
+        - skip_ansible_lint
 
-  - name: TARSNAP | build / configure
-    shell: ./configure
-    when: tarsnap_present is failed
-    args:
-      chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
-    tags:
-      - tarsnap
-      - skip_ansible_lint
+    - name: TARSNAP | build / configure
+      shell: ./configure
+      when: tarsnap_present is failed
+      args:
+        chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
+      tags:
+        - tarsnap
+        - skip_ansible_lint
 
-  - name: TARSNAP | make install
-    shell: make install clean
-    args:
-      chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
-    when: tarsnap_present is failed
-    become: yes
-    tags:
-      - tarsnap
-      - skip_ansible_lint
+    - name: TARSNAP | make install
+      shell: make install clean
+      args:
+        chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
+      when: tarsnap_present is failed
+      become: yes
+      tags:
+        - tarsnap
+        - skip_ansible_lint
+    when: tarsnap_install_method == "source"
+
+  - block:
+      - name: TARSNAP | add apt key
+        apt_key:
+          keyserver: keyserver.ubuntu.com
+          id: 0x6D97F5A4CA38CF33
+        when: tarsnap_present is failed
+        become: yes
+        tags:
+          - tarsnap
+
+      - name: TARSNAP | add tarsnap apt repository
+        apt_repository:
+          repo: "deb http://pkg.tarsnap.com/deb/{{ ansible_distribution_release }} ./"
+          state: present
+        when: tarsnap_present is failed
+        become: yes
+        tags:
+          - tarsnap
+
+      - name: TARSNAP | Update apt cache
+        apt: update_cache=yes
+        when: tarsnap_present is failed
+        become: yes
+        tags:
+          - tarsnap
+
+      - name: TARSNAP | Install package
+        apt:
+         pkg:
+           - tarsnap
+           - tarsnap-archive-keyring
+         state: present
+        when: tarsnap_present is failed
+        become: yes
+        tags:
+          - tarsnap
+
+    when: tarsnap_install_method == "repo"
 
   - name: TARSNAP | Check config present
     command: test -x /usr/local/etc/tarsnap.conf

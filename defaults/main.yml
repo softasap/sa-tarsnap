@@ -1,3 +1,4 @@
 ---
 # defaults file for sa-tarsnap
-  tarsnap_version: 1.0.37
+  tarsnap_install_method: repo #source
+  tarsnap_version: 1.0.37 # ignored if not source
