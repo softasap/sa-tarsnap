@@ -4,65 +4,72 @@
     command: test -x /usr/local/bin/tarsnap
     ignore_errors: yes
     register: tarsnap_present
+    changed_when: false
     tags:
       - tarsnap
 
 
   - name: TARSNAP | Dependencies
-    apt: pkg="{{item}}" state="present"
+    apt: pkg="{{ item }}" state="present"
     with_items:
       - build-essential
       - ext2fs-dev
       - zlib1g-dev
       - libssl-dev
     become: yes
-    when: tarsnap_present | failed
+    when: tarsnap_present is failed
     tags:
       - tarsnap
 
   - name: TARSNAP | Download source code
-    get_url: url="https://www.tarsnap.com/download/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz"
-    when: tarsnap_present | failed
+    get_url:
+      url: "https://www.tarsnap.com/download/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+      dest: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+    when: tarsnap_present is failed
     tags:
       - tarsnap
 
   - name: TARSNAP | Unpack distribution
-    shell: "tar xfz tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz"
-    when: tarsnap_present | failed
+    shell: "tar xfz tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}.tgz"
+    when: tarsnap_present is failed
     args:
       chdir: /tmp
 #    unarchive: src="/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}.tgz" dest=/tmp remote_src=yes
     tags:
       - tarsnap
+      - skip_ansible_lint
 
   - name: TARSNAP | build / configure
     shell: ./configure
-    when: tarsnap_present | failed
+    when: tarsnap_present is failed
     args:
-      chdir: "/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}"
+      chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
     tags:
       - tarsnap
+      - skip_ansible_lint
 
   - name: TARSNAP | make install
     shell: make install clean
     args:
-      chdir: "/tmp/tarsnap-autoconf-{{tarsnap_version | default('1.0.37')}}"
-    when: tarsnap_present | failed
+      chdir: "/tmp/tarsnap-autoconf-{{ tarsnap_version | default('1.0.37') }}"
+    when: tarsnap_present is failed
     become: yes
     tags:
       - tarsnap
+      - skip_ansible_lint
 
   - name: TARSNAP | Check config present
     command: test -x /usr/local/etc/tarsnap.conf
     ignore_errors: yes
     register: tarsnap_conf_present
     tags:
-        - tarsnap
-
+      - tarsnap
+      - skip_ansible_lint
 
   - name: TARSNAP | Populate initial config, if not
     shell: cp /usr/local/etc/tarsnap.conf.sample /usr/local/etc/tarsnap.conf
-    when: tarsnap_conf_present | failed
+    when: tarsnap_conf_present is failed
     become: yes
     tags:
-        - tarsnap
+      - tarsnap
+      - skip_ansible_lint
