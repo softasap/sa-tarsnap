@@ -108,7 +108,9 @@
       - skip_ansible_lint
 
   - name: TARSNAP | Populate initial config, if not
-    shell: cp /usr/local/etc/tarsnap.conf.sample /usr/local/etc/tarsnap.conf
+    get_url:
+        url: https://raw.githubusercontent.com/Tarsnap/tarsnap/master/tar/tarsnap.conf.sample
+        dest: /usr/local/etc/tarsnap.conf
     when: tarsnap_conf_present is failed
     become: yes
     tags:
