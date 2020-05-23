@@ -63,8 +63,8 @@
   - block:
       - name: TARSNAP | add apt key
         apt_key:
-          keyserver: keyserver.ubuntu.com
-          id: 0x6D97F5A4CA38CF33
+          url: https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
+          state: present
         when: tarsnap_present is failed
         become: yes
         tags:
